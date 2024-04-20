@@ -4,7 +4,7 @@
 
 Basic button setup for the Gram Slim FGC.
 
-![Buttons](assets/GramSlimFgc_buttons.png)
+![Buttons](assets/GramSlimFgc_buttons.jpg)
 
 GitHub repo for the Gram Slim FGC:
 TBD
