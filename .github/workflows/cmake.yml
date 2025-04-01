@@ -20,10 +20,54 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        GP2040_BOARDCONFIG: [Pico, PicoW, BentoBox, FightboardV3, FightboardV3Mirrored, FlatboxRev4, FlatboxRev5, FlatboxRev5RGB, FlatboxRev5Southpaw, Granola, KB2040, KeyboardConverter, Haute42COSMOX, Liatris, Mavercade, OpenCore0, OpenCore0WASD, PicoAnn, PicoFightingBoard, RanaTadpole, ReflexCtrlSNES, ReflexEncodeV1.2, ReflexEncodeV2.0, RP2040AdvancedBreakoutBoard, RP2040AdvancedBreakoutBoardUSBPassthrough, RP2040MiniBreakoutBoard, SparkFunProMicro, WaveshareZero, Stress, SGFBridget, SGFFaust]
+        GP2040_BOARDCONFIG: 
+          [ARCController,
+          Blank,
+          Pico,
+          PicoW,
+          BentoBox,
+          DuelPadZen,
+          FlatboxRev4,
+          FlatboxRev5,
+          FlatboxRev5RGB,
+          FlatboxRev5USBPassthrough,
+          FlatboxRev5Southpaw,
+          Granola,
+          KB2040,
+          KeyboardConverter,
+          Haute42COSMOX,
+          Haute42COSMOXMLite,
+          Haute42COSMOXMUltra,
+          Haute42COSMOXXAnalog,
+          Liatris,
+          MavercadeRev1,
+          MavercadeRev2,
+          MiSTercadeV2,
+          OpenCore0,
+          OpenCore0WASD,
+          OSUMGP-RP2040,
+          PicoAnn,
+          PicoFightingBoard,
+          PXPGamepad,
+          ReflexCtrlGenesis6,
+          ReflexCtrlNES,
+          ReflexCtrlSaturn,
+          ReflexCtrlSNES,
+          ReflexCtrlVB,
+          ReflexEncodeV1.2,
+          ReflexEncodeV2.0,
+          RP2040AdvancedBreakoutBoard,
+          RP2040AdvancedBreakoutBoardUSBPassthrough,
+          RP2040MiniBreakoutBoard,
+          RP2040MiniBreakoutBoardUSBPassthrough,
+          SparkFunProMicro,
+          WaveshareZero,
+          Stress,
+          SGFDevices,
+          ZeroRhythm]
 
     steps:
     #Global Setup
@@ -67,7 +111,7 @@ jobs:
         name: GP2040-CE - ${{ matrix.GP2040_BOARDCONFIG }}
         path: ${{github.workspace}}/build/GP2040-CE_*_${{ matrix.GP2040_BOARDCONFIG }}.uf2
         if-no-files-found: error
-        
+
     - name: Upload .elf Artifact
       if: ${{ matrix.GP2040_BOARDCONFIG == 'Pico'}}
       uses: actions/upload-artifact@v4.3.1
