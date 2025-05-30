@@ -250,7 +250,7 @@ void NeoPicoLEDAddon::setup() {
     }
 
 	// Setup NeoPico ws2812 PIO
-	neopico.Setup(ledOptions.dataPin, ledCount, static_cast<LEDFormat>(ledOptions.ledFormat), pio0);
+	neopico.Setup(ledOptions.dataPin, ledCount, static_cast<LEDFormat>(ledOptions.ledFormat), pio1);
 	neopico.Off(); // turn off everything
 
 	// Rewrite this
@@ -1091,7 +1091,7 @@ void NeoPicoLEDAddon::ambientHotkeys(Gamepad *gamepad)
 	}
 
 	if (reqSave) {
-		EventManager::getInstance().triggerEvent(new GPStorageSaveEvent(true));
+		EventManager::getInstance().triggerEvent(new GPStorageSaveEvent(false));
 	}
 
 	lastAmbientAction = action;

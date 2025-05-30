@@ -13,6 +13,8 @@ export default {
 	'profile-disabled': ' - (Disabled)',
 	'profile-enabled-tooltip':
 		'Disabled profiles will not be available when using hotkeys to change profile.',
+	'profile-enabled-active-tooltip':
+		'Cannot disable active profile, change under Settings > Gamepad Settings',
 	'profile-pins-warning':
 		'Try to avoid changing the buttons and/or directions used for the switch profile hotkeys. Otherwise, it will be difficult to understand what profile is being selected!',
 	'profile-copy-base': 'Copy base profile',
@@ -86,8 +88,8 @@ export default {
 		ANALOG_DIRECTION_RS_X_POS: 'Right Analog Stick X+',
 		ANALOG_DIRECTION_RS_Y_NEG: 'Right Analog Stick Y-',
 		ANALOG_DIRECTION_RS_Y_POS: 'Right Analog Stick Y+',
-		ANALOG_DIRECTION_MOD_LOW: 'Analog Stick Modifier Low',
-		ANALOG_DIRECTION_MOD_HIGH: 'Analog Stick Modifier High',
+		ANALOG_DIRECTION_MOD_LOW: 'Analog Stick Tilt 1',
+		ANALOG_DIRECTION_MOD_HIGH: 'Analog Stick Tilt 2',
 		BUTTON_PRESS_INPUT_REVERSE: 'Reverse Input',
 		SUSTAIN_FOCUS_MODE: 'Focus Mode Enable',
 		SUSTAIN_4_8_WAY_MODE: 'Toggle 4-Way Mode',
