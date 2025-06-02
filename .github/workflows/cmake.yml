@@ -32,7 +32,7 @@ jobs:
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v2
       with:
-        cmake-version: '3.17.x'
+        cmake-version: '3.16.x'
     - name: Verify cmake
       run: cmake --version
 
@@ -44,7 +44,7 @@ jobs:
         fetch-tags: true
 
     - name: Setup SDK pipeline
-      uses: Fortinbra/RaspberryPiPicoBuild@v6
+      uses: Fortinbra/RaspberryPiPicoBuild@v3
 
     - name: Download a Build Artifact
       uses: actions/download-artifact@v4.1.2
@@ -85,3 +85,66 @@ jobs:
         name: elf
         path: ${{github.workspace}}/build/GP2040-CE_*_${{ matrix.GP2040_BOARDCONFIG }}.elf
         if-no-files-found: error
+
+    # Extract version information
+    - name: Extract version information
+      id: version
+      run: |
+        # Get Git version info
+        GIT_VERSION=$(git describe --tags --always --dirty --abbrev=7)
+        echo "git_version=$GIT_VERSION" >> $GITHUB_OUTPUT
+        echo "Found git version: $GIT_VERSION"
+
+        # Get the actual UF2 filename
+        UF2_FILE=$(ls ${{github.workspace}}/build/GP2040-CE_*_${{ matrix.GP2040_BOARDCONFIG }}.uf2)
+        echo "uf2_file=$UF2_FILE" >> $GITHUB_OUTPUT
+        echo "UF2 file: $UF2_FILE"
+
+        # Set upstream info variables
+        UPSTREAM_TAG="${{ github.event.client_payload.upstream_tag }}"
+        UPSTREAM_COMMIT="${{ github.event.client_payload.upstream_commit }}"
+        UPSTREAM_VERSION="${{ github.event.client_payload.upstream_version }}"
+
+        # If no upstream version is provided, default to the local git version
+        if [[ -z "$UPSTREAM_VERSION" ]]; then
+          UPSTREAM_VERSION="0.0.0"
+        fi
+        echo "upstream_version=$UPSTREAM_VERSION" >> $GITHUB_OUTPUT
+
+        # If this is triggered by repository_dispatch, use upstream info
+        if [[ -n "$UPSTREAM_TAG" && -n "$UPSTREAM_COMMIT" ]]; then
+          echo "upstream_tag=$UPSTREAM_TAG" >> $GITHUB_OUTPUT
+          echo "upstream_commit=$UPSTREAM_COMMIT" >> $GITHUB_OUTPUT
+          echo "Using upstream tag: $UPSTREAM_TAG, commit: $UPSTREAM_COMMIT, version: $UPSTREAM_VERSION"
+        fi
+
+        # Create a new filename with version information
+        BASE_NAME=$(basename "$UF2_FILE")
+        # Extract the base part of the filename without version
+        BASE_PREFIX="GP2040-CE"
+
+        # Use upstream version number and local commit hash
+        NEW_NAME="${BASE_PREFIX}_${UPSTREAM_VERSION}_${{ matrix.GP2040_BOARDCONFIG }}_${GIT_VERSION}.uf2"
+
+        cp "$UF2_FILE" "${{github.workspace}}/build/$NEW_NAME"
+        echo "versioned_uf2_file=${{github.workspace}}/build/$NEW_NAME" >> $GITHUB_OUTPUT
+        echo "Created versioned UF2: $NEW_NAME"
+
+    # Create a GitHub release
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: |
+          ${{ github.event.client_payload.upstream_version != '' && format('GP2040-CE {0} - {1}', github.event.client_payload.upstream_version, matrix.GP2040_BOARDCONFIG) || format('GP2040-CE {0} - {1}', steps.version.outputs.git_version, matrix.GP2040_BOARDCONFIG) }}
+        tag_name: |
+          ${{ github.event.client_payload.upstream_tag != '' && format('upstream-{0}', github.event.client_payload.upstream_tag) || format('build-{0}', steps.version.outputs.git_version) }}
+        files: ${{ steps.version.outputs.versioned_uf2_file }}
+        body: |
+          ${{ github.event.client_payload.upstream_tag != '' && format('Merge from OpenStickCommunity/GP2040-CE {0} (commit {1})', github.event.client_payload.upstream_tag, github.event.client_payload.upstream_commit) || 'Local build' }}
+          Board: ${{ matrix.GP2040_BOARDCONFIG }}
+          Git version: ${{ steps.version.outputs.git_version }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
