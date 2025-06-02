@@ -62,23 +62,9 @@ jobs:
             git add .github/workflows/cmake.yml
           fi
 
-      - name: Get upstream version info
-        id: upstream-version
-        run: |
-          # Get the latest tag from upstream
-          UPSTREAM_TAG=$(git ls-remote --tags --refs https://github.com/OpenStickCommunity/GP2040-CE.git | sort -t '/' -k 3 -V | tail -n1 | awk -F/ '{print $3}')
-          echo "upstream_tag=$UPSTREAM_TAG" >> $GITHUB_OUTPUT
-
-          # Get the latest commit hash from upstream
-          UPSTREAM_COMMIT=$(git ls-remote https://github.com/OpenStickCommunity/GP2040-CE.git HEAD | awk '{print $1}')
-          echo "upstream_commit=${UPSTREAM_COMMIT:0:7}" >> $GITHUB_OUTPUT
-
-          echo "Upstream tag: $UPSTREAM_TAG"
-          echo "Upstream commit: ${UPSTREAM_COMMIT:0:7}"
-
       - name: Commit changes
         run: |
-          git commit -m "Merge upstream changes from OpenStickCommunity/GP2040-CE ${{ steps.upstream-version.outputs.upstream_tag }} (${{ steps.upstream-version.outputs.upstream_commit }})" || echo "No changes to commit"
+          git commit -m "Merge upstream changes from OpenStickCommunity/GP2040-CE" || echo "No changes to commit"
 
       - name: Push changes
         run: git push
@@ -89,14 +75,6 @@ jobs:
         run: |
           if git log -1 | grep -q "Merge upstream changes"; then
             echo "changes_made=true" >> $GITHUB_OUTPUT
-            # Extract upstream version info from commit message
-            COMMIT_MSG=$(git log -1 --pretty=%B)
-            if [[ $COMMIT_MSG =~ OpenStickCommunity/GP2040-CE\ ([^\ ]+)\ \(([^\)]+)\) ]]; then
-              UPSTREAM_TAG="${BASH_REMATCH[1]}"
-              UPSTREAM_COMMIT="${BASH_REMATCH[2]}"
-              echo "upstream_tag=$UPSTREAM_TAG" >> $GITHUB_OUTPUT
-              echo "upstream_commit=$UPSTREAM_COMMIT" >> $GITHUB_OUTPUT
-            fi
           else
             echo "changes_made=false" >> $GITHUB_OUTPUT
           fi
@@ -108,4 +86,3 @@ jobs:
         with:
           event-type: trigger-build
           token: ${{ secrets.PAT_TOKEN }}
-          client-payload: '{"upstream_tag": "${{ steps.check_changes.outputs.upstream_tag }}", "upstream_commit": "${{ steps.check_changes.outputs.upstream_commit }}"}'
