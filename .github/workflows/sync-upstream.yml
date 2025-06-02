@@ -1,0 +1,88 @@
+name: Sync and Build from Upstream
+
+on:
+  schedule:
+    # Check for updates every day at midnight
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  sync-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: 20240419-GRAM-SlimFGC # Use your main branch
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      - name: Add upstream remote
+        run: git remote add upstream https://github.com/OpenStickCommunity/GP2040-CE.git
+
+      - name: Fetch from upstream
+        run: git fetch upstream
+
+      # Save original cmake.yml content to preserve board configurations
+      - name: Save original cmake.yml
+        run: cp .github/workflows/cmake.yml /tmp/original_cmake.yml
+
+      - name: Merge upstream changes
+        run: |
+          # Try to merge upstream main branch
+          if git merge upstream/main --no-commit; then
+            echo "Upstream changes merged successfully."
+          else
+            echo "Merge conflicts detected. Resolving..."
+            
+            # Restore the original cmake.yml to ensure our config is preserved
+            cp /tmp/original_cmake.yml .github/workflows/cmake.yml
+            git add .github/workflows/cmake.yml
+            
+            # Try to continue with the merge
+            git merge --continue || git merge --abort
+            
+            # If merge aborted, exit with error
+            if [ $? -ne 0 ]; then
+              echo "Failed to auto-resolve merge conflicts. Manual intervention required."
+              exit 1
+            fi
+          fi
+
+      # Double check that our cmake.yml still only has the board we want
+      - name: Verify board configs
+        run: |
+          if grep -q -v "GramSlimFGC" .github/workflows/cmake.yml | grep -q "GP2040_BOARDCONFIG"; then
+            echo "Error: Additional board configurations detected in cmake.yml. Reverting changes."
+            cp /tmp/original_cmake.yml .github/workflows/cmake.yml
+            git add .github/workflows/cmake.yml
+          fi
+
+      - name: Commit changes
+        run: |
+          git commit -m "Merge upstream changes from OpenStickCommunity/GP2040-CE" || echo "No changes to commit"
+
+      - name: Push changes
+        run: git push
+
+      # Trigger the build workflow if there were changes
+      - name: Check if changes were made
+        id: check_changes
+        run: |
+          if git log -1 | grep -q "Merge upstream changes"; then
+            echo "changes_made=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes_made=false" >> $GITHUB_OUTPUT
+          fi
+
+      # This step triggers the build workflow if changes were made
+      - name: Trigger build workflow
+        if: steps.check_changes.outputs.changes_made == 'true'
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          event-type: trigger-build
+          token: ${{ secrets.PAT_TOKEN }}

@@ -1,0 +1,17 @@
+name: Workflow Permissions
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  pull-requests: write
+  repository-projects: write
+
+jobs:
+  info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Information
+        run: echo "This workflow exists to define permissions for GitHub Actions tokens used in other workflows."
