@@ -32,7 +32,7 @@ jobs:
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v2
       with:
-        cmake-version: '3.16.x'
+        cmake-version: '3.17.x'
     - name: Verify cmake
       run: cmake --version
 
@@ -44,7 +44,12 @@ jobs:
         fetch-tags: true
 
     - name: Setup SDK pipeline
-      uses: Fortinbra/RaspberryPiPicoBuild@v3
+      uses: Fortinbra/RaspberryPiPicoBuild@v6
+
+    - name: Install compatible protobuf and grpc versions
+      run: |
+        pip install protobuf==5.29.5 grpcio==1.71.0 grpcio-tools==1.71.0
+        pip freeze | grep -E 'protobuf|grpcio'
 
     - name: Download a Build Artifact
       uses: actions/download-artifact@v4.1.2
