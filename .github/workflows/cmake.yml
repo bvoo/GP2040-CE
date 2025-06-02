@@ -2,9 +2,9 @@ name: CMake
 
 on:
   push:
-    branches: [ "20240419-GRAM-SlimFGC" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "20240419-GRAM-SlimFGC" ]
+    branches: [ "main" ]
 #  pull_request_target:
 #    branches: [ "main" ]
   workflow_dispatch:
