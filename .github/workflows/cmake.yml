@@ -46,11 +46,6 @@ jobs:
     - name: Setup SDK pipeline
       uses: Fortinbra/RaspberryPiPicoBuild@v6
 
-    - name: Install compatible protobuf and grpc versions
-      run: |
-        pip install protobuf==5.29.5 grpcio==1.71.0 grpcio-tools==1.71.0
-        pip freeze | grep -E 'protobuf|grpcio'
-
     - name: Download a Build Artifact
       uses: actions/download-artifact@v4.1.2
       with:
@@ -74,7 +69,15 @@ jobs:
 
     - name: Pico Build
       shell: bash
-      run: GP2040_BOARDCONFIG=${{ matrix.GP2040_BOARDCONFIG }} cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel ${{steps.core_count.outputs.output}}
+      run: |
+        # Install specific protobuf and grpc versions in the virtual environment
+        cd ${{github.workspace}}/build
+        source ./venv/bin/activate
+        pip install protobuf==5.29.5 grpcio==1.71.0 grpcio-tools==1.71.0
+        pip freeze | grep -E 'protobuf|grpcio'
+
+        # Run the build
+        GP2040_BOARDCONFIG=${{ matrix.GP2040_BOARDCONFIG }} cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel ${{steps.core_count.outputs.output}}
 
     - name: Upload Pico Artifact
       uses: actions/upload-artifact@v4.3.1
