@@ -38,8 +38,22 @@ execute_process(COMMAND ${GIT_EXECUTABLE} describe --always --abbrev=7
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	OUTPUT_VARIABLE GIT_REPO_BUILD_ID
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
+# Extract semantic version from tags like v0.7.11
 string(REGEX REPLACE "v([0-9]+\\.[0-9]+\\.[0-9]+).*" "\\1" CMAKE_GIT_REPO_VERSION ${GIT_REPO_VERSION})
-string(REGEX REPLACE "^(.......-.*)|(.......)$" "0.0.0" CMAKE_GIT_REPO_VERSION ${CMAKE_GIT_REPO_VERSION}) # fix if all we have is the git SHA
+
+# Handle special case for build prefix
+if(GIT_REPO_VERSION MATCHES "^build-.*")
+  # Extract version from build-vX.Y.Z format if possible
+  if(GIT_REPO_VERSION MATCHES "build-v([0-9]+\\.[0-9]+\\.[0-9]+)")
+    set(CMAKE_GIT_REPO_VERSION "${CMAKE_MATCH_1}")
+  else()
+    # Use a default valid semantic version
+    set(CMAKE_GIT_REPO_VERSION "0.0.0")
+  endif()
+elseif(CMAKE_GIT_REPO_VERSION STREQUAL GIT_REPO_VERSION)
+  # If no match was found, use default version
+  set(CMAKE_GIT_REPO_VERSION "0.0.0")
+endif()
 configure_file("headers/version.h.in" "headers/version.h")
 message("GIT_REPO_VERSION is ${GIT_REPO_VERSION}")
 message("CMAKE_GIT_REPO_VERSION is ${CMAKE_GIT_REPO_VERSION}")
