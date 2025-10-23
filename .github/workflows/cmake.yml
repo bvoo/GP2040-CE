@@ -198,13 +198,11 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          name: |
-            ${github.event.client_payload.upstream_version != '' && format('GP2040-CE {0} - {1}', github.event.client_payload.upstream_version, matrix.GP2040_BOARDCONFIG) || format('GP2040-CE {0} - {1}', steps.version.outputs.git_version, matrix.GP2040_BOARDCONFIG)}
-          tag_name: |
-            ${github.event.client_payload.upstream_tag != '' && format('upstream-{0}', github.event.client_payload.upstream_tag) || format('build-{0}', steps.version.outputs.git_version)}
+          name: ${{ github.event.client_payload.upstream_version != '' && format('GP2040-CE {0} - {1}', github.event.client_payload.upstream_version, matrix.GP2040_BOARDCONFIG) || format('GP2040-CE {0} - {1}', steps.version.outputs.git_version, matrix.GP2040_BOARDCONFIG) }}
+          tag_name: ${{ github.event.client_payload.upstream_tag != '' && format('upstream-{0}', github.event.client_payload.upstream_tag) || format('build-{0}', steps.version.outputs.git_version) }}
           files: ${{ steps.version.outputs.versioned_uf2_file }}
           body: |
-            ${github.event.client_payload.upstream_tag != '' && format('Merge from OpenStickCommunity/GP2040-CE {0} (commit {1})', github.event.client_payload.upstream_tag, github.event.client_payload.upstream_commit) || 'Local build'}
+            ${{ github.event.client_payload.upstream_tag != '' && format('Merge from OpenStickCommunity/GP2040-CE {0} (commit {1})', github.event.client_payload.upstream_tag, github.event.client_payload.upstream_commit) || 'Local build' }}
             Board: ${{ matrix.GP2040_BOARDCONFIG }}
             Git version: ${{ steps.version.outputs.git_version }}
           draft: false
