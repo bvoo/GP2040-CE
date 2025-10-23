@@ -153,8 +153,8 @@ jobs:
       - name: Extract version information
         id: version
         run: |
-          # Get Git version info
-          GIT_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || git rev-parse --short=7 HEAD)
+          # Get Git version info (only match version tags like v0.7.9)
+          GIT_VERSION=$(git describe --tags --match "v*" --abbrev=0 2>/dev/null || git rev-parse --short=7 HEAD)
           echo "git_version=$GIT_VERSION" >> $GITHUB_OUTPUT
           echo "Found git version: $GIT_VERSION"
 
