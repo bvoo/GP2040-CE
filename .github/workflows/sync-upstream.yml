@@ -33,25 +33,23 @@ jobs:
 
       - name: Merge upstream changes
         run: |
-          # Try to merge upstream main branch
-          if git merge upstream/main --no-commit; then
+          if git merge upstream/main -X theirs --no-edit -m "Merge upstream changes from OpenStickCommunity/GP2040-CE"; then
             echo "Upstream changes merged successfully."
           else
-            echo "Merge conflicts detected. Resolving..."
+            echo "Merge had conflicts. Accepting upstream changes for most files..."
 
-            # Restore the original cmake.yml to ensure our config is preserved
+            git checkout --theirs lib/nanopb/extra/requirements.txt 2>/dev/null || true
+            git add lib/nanopb/extra/requirements.txt 2>/dev/null || true
+
             cp /tmp/original_cmake.yml .github/workflows/cmake.yml
             git add .github/workflows/cmake.yml
 
-            # Try to continue with the merge
-            git merge --continue || git merge --abort
-
-            # If merge aborted, exit with error
-            if [ $? -ne 0 ]; then
-              echo "Failed to auto-resolve merge conflicts. Manual intervention required."
-              exit 1
-            fi
+            git commit -m "Merge upstream changes from OpenStickCommunity/GP2040-CE"
           fi
+
+          cp /tmp/original_cmake.yml .github/workflows/cmake.yml
+          git add .github/workflows/cmake.yml
+          git commit --amend --no-edit || echo "No changes needed for cmake.yml"
 
       # Double check that our cmake.yml still only has the board we want
       - name: Verify board configs
@@ -62,9 +60,9 @@ jobs:
             git add .github/workflows/cmake.yml
           fi
 
-      - name: Commit changes
+      - name: Verify merge completed
         run: |
-          git commit -m "Merge upstream changes from OpenStickCommunity/GP2040-CE" || echo "No changes to commit"
+          git log -1 --oneline
 
       - name: Push changes
         run: git push
