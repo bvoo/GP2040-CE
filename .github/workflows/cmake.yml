@@ -192,7 +192,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: GP2040-CE ${{ steps.version.outputs.upstream_version }} - ${{ matrix.GP2040_BOARDCONFIG }}
-          tag_name: upstream-${{ steps.version.outputs.upstream_tag }}
+          tag_name: ${{ steps.version.outputs.upstream_tag }}
           files: ${{ steps.version.outputs.versioned_uf2_file }}
           body: |
             Merge from OpenStickCommunity/GP2040-CE ${{ steps.version.outputs.upstream_tag }} (commit ${{ steps.version.outputs.upstream_commit }})
