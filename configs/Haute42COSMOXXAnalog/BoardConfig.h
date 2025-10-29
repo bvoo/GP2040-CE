@@ -12,7 +12,7 @@
  #define BOARD_CONFIG_LABEL "Haute42 COSMOX X Series Analog"
  
  // Main pin mapping Configuration
- //                          // GP2040 | Xinput | Switch  | PS3/4/5  | Dinput | Arcade |
+ //                                                  // GP2040 | Xinput | Switch  | PS3/4/5  | Dinput | Arcade |
  #define GPIO_PIN_02 GpioAction::BUTTON_PRESS_UP     // UP     | UP     | UP      | UP       | UP     | UP     |
  #define GPIO_PIN_03 GpioAction::BUTTON_PRESS_DOWN   // DOWN   | DOWN   | DOWN    | DOWN     | DOWN   | DOWN   |
  #define GPIO_PIN_04 GpioAction::BUTTON_PRESS_RIGHT  // RIGHT  | RIGHT  | RIGHT   | RIGHT    | RIGHT  | RIGHT  |
@@ -78,6 +78,7 @@
  #define TURBO_ENABLED 1
  #define GPIO_PIN_14 GpioAction::BUTTON_PRESS_TURBO
 
+ #define BOARD_LEDS_PIN 22
  #define LED_BRIGHTNESS_MAXIMUM 100
  #define LED_BRIGHTNESS_STEPS 5
  #define LED_FORMAT LED_FORMAT_GRB
@@ -179,10 +180,10 @@
 
  // Haute42|COSMOX X Series
 #define DEFAULT_BOARD_LAYOUT_A_ALT1 {\
-     {GP_ELEMENT_PIN_BUTTON, {24, 24, 31, 31, 1, 1, 5, GP_SHAPE_SQUARE, 22}},\
-     {GP_ELEMENT_PIN_BUTTON, {32, 28, 39, 35, 1, 1, 3, GP_SHAPE_SQUARE, 22}},\
-     {GP_ELEMENT_PIN_BUTTON, {36, 20, 43, 27, 1, 1, 2, GP_SHAPE_SQUARE, 22}},\
-     {GP_ELEMENT_PIN_BUTTON, {40, 32, 47, 39, 1, 1, 4, GP_SHAPE_SQUARE, 22}},\
+     {GP_ELEMENT_PIN_BUTTON, {42, 19, 4, 4, 1, 1, 2,   GP_SHAPE_ELLIPSE}},\
+     {GP_ELEMENT_PIN_BUTTON, {27, 27, 4, 4, 1, 1, 5,   GP_SHAPE_ELLIPSE}},\
+     {GP_ELEMENT_PIN_BUTTON, {37, 27, 4, 4, 1, 1, 3,   GP_SHAPE_ELLIPSE}},\
+     {GP_ELEMENT_PIN_BUTTON, {45, 32, 4, 4, 1, 1, 4,   GP_SHAPE_ELLIPSE}},\
      {GP_ELEMENT_PIN_BUTTON, {25, 15, 2, 2, 1, 1, 14,  GP_SHAPE_ELLIPSE}},\
      {GP_ELEMENT_PIN_BUTTON, {32, 15, 2, 2, 1, 1, 21,  GP_SHAPE_ELLIPSE}},\
      {GP_ELEMENT_PIN_BUTTON, {82, 15, 2, 2, 1, 1, 20,  GP_SHAPE_ELLIPSE}},\
