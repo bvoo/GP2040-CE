@@ -15,6 +15,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: main # Use your main branch
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Configure Git
         run: |
@@ -83,4 +84,4 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           event-type: trigger-build
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
