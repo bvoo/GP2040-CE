@@ -90,19 +90,33 @@ jobs:
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v2
         with:
-          cmake-version: "3.17.x"
+          cmake-version: "3.31.x"
       - name: Verify cmake
         run: cmake --version
 
       #Global Setup
       - name: Checkout GP2040-CE
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v6.0.1
         with:
           fetch-depth: 0
           fetch-tags: true
+          
+      - name: arm-none-eabi-gcc GNU Arm Embedded Toolchain
+        uses: carlosperate/arm-none-eabi-gcc-action@v1.11.1
+
+      - name: Checkout pico-sdk/2.2.0
+        uses: actions/checkout@v6.0.1
+        with:
+          repository: raspberrypi/pico-sdk
+          ref: 2.2.0
+          path: pico-sdk
 
       - name: Setup SDK pipeline
         uses: Fortinbra/RaspberryPiPicoBuild@v7
+
+      - name: Checkout pico-sdk submodules
+        working-directory: ${{github.workspace}}/pico-sdk
+        run: git submodule update --init
 
       - name: Clean upstream tags
         run: |
