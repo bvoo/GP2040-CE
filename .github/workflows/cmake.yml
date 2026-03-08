@@ -111,9 +111,6 @@ jobs:
           ref: 2.2.0
           path: pico-sdk
 
-      - name: Setup SDK pipeline
-        uses: Fortinbra/RaspberryPiPicoBuild@v7
-
       - name: Checkout pico-sdk submodules
         working-directory: ${{github.workspace}}/pico-sdk
         run: git submodule update --init
@@ -137,17 +134,7 @@ jobs:
         shell: bash
         if: ${{ matrix.GP2040_BOARDCONFIG != 'PicoW' && matrix.GP2040_BOARDCONFIG != 'Pico2' && matrix.GP2040_BOARDCONFIG != 'SparkFunProMicroRP2350' && matrix.GP2040_BOARDCONFIG != 'FlatboxRev8' }}
         run: PICO_SDK_PATH=${{github.workspace}}/pico-sdk GP2040_BOARDCONFIG=${{ matrix.GP2040_BOARDCONFIG }} SKIP_WEBBUILD=TRUE cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-
-      - name: PicoW Build Configure CMake
-        shell: bash
-        if: ${{ matrix.GP2040_BOARDCONFIG == 'PicoW'}}
-        run: PICO_SDK_PATH=${{github.workspace}}/pico-sdk GP2040_BOARDCONFIG=${{ matrix.GP2040_BOARDCONFIG }} SKIP_WEBBUILD=TRUE cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DPICO_BOARD=pico_w
-
-      - name: Pico2 Build Configure CMake
-        shell: bash
-        if: ${{ matrix.GP2040_BOARDCONFIG == 'Pico2' || matrix.GP2040_BOARDCONFIG == 'SparkFunProMicroRP2350' || matrix.GP2040_BOARDCONFIG == 'FlatboxRev8' }}
-        run: PICO_SDK_PATH=${{github.workspace}}/pico-sdk GP2040_BOARDCONFIG=${{ matrix.GP2040_BOARDCONFIG }} SKIP_WEBBUILD=TRUE cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DPICO_BOARD=pico2 -DPICO_PLATFORM=rp2350-arm-s
-
+        
       - name: Pico Build
         shell: bash
         run: GP2040_BOARDCONFIG=${{ matrix.GP2040_BOARDCONFIG }} cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel ${{steps.core_count.outputs.output}}
