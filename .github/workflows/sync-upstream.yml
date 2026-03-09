@@ -66,7 +66,9 @@ jobs:
           git log -1 --oneline
 
       - name: Push changes
-        run: git push
+        run: |
+          git pull
+          git push
 
       # Trigger the build workflow if there were changes
       - name: Check if changes were made
