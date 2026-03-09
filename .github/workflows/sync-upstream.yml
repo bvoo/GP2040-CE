@@ -35,22 +35,15 @@ jobs:
       - name: Merge upstream changes
         run: |
           if git merge upstream/main -X theirs --no-edit -m "Merge upstream changes from OpenStickCommunity/GP2040-CE"; then
-            echo "Upstream changes merged successfully."
+            echo "Merged successfully."
           else
-            echo "Merge had conflicts. Accepting upstream changes for most files..."
-
             git checkout --theirs lib/nanopb/extra/requirements.txt 2>/dev/null || true
             git add lib/nanopb/extra/requirements.txt 2>/dev/null || true
-
-            cp /tmp/original_cmake.yml .github/workflows/cmake.yml
-            git add .github/workflows/cmake.yml
-
             git commit -m "Merge upstream changes from OpenStickCommunity/GP2040-CE"
           fi
-
+          # Restore cmake.yml as a separate clean commit
           cp /tmp/original_cmake.yml .github/workflows/cmake.yml
-          git add .github/workflows/cmake.yml
-          git commit --amend --no-edit || echo "No changes needed for cmake.yml"
+          git diff --quiet .github/workflows/cmake.yml || git commit -am "Restore cmake.yml board configuration"
 
       # Double check that our cmake.yml still only has the board we want
       - name: Verify board configs
@@ -67,7 +60,7 @@ jobs:
 
       - name: Push changes
         run: |
-          git pull
+          git pull --rebase
           git push
 
       # Trigger the build workflow if there were changes
